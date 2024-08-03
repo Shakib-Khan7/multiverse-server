@@ -44,17 +44,26 @@ async function run() {
 
         app.get('/toys', async (req, res) => {
             const incominQuery = req.query.sub_category
-            console.log(incominQuery);
+            const limit = parseInt(req.query.limit)
+            
             let query = {}
             if (incominQuery) {
                 query = { sub_category: incominQuery }
             }
 
 
-            const cursor = toysCollection.find(query)
+            const cursor = toysCollection.find(query).limit(limit)
+            
             const result = await cursor.toArray()
             res.send(result)
 
+        })
+
+
+        app.post('/addToy' ,async(req,res)=>{
+            const addToy = req.body;
+            const result = await toysCollection.insertOne(addToy)
+            res.send(result)
         })
 
 
