@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 
@@ -64,6 +64,42 @@ async function run() {
             const addToy = req.body;
             const result = await toysCollection.insertOne(addToy)
             res.send(result)
+        })
+
+        app.get('/myToys',async (req,res)=>{
+            
+            let query = {}
+            if(req.query?.email){
+                query = {seller_email : req.query.email}
+            }
+            const result = await toysCollection.find(query).toArray()
+            
+            res.send(result)
+        })
+
+        app.delete('/deleteToy/:id',async(req,res)=>{
+            const id = req.params.id
+            const query = {_id : new ObjectId(id)}
+            const result = await toysCollection.deleteOne(query)
+            res.send(result)
+
+
+        })
+
+        app.put('/update/:id',async(req,res)=>{
+            const id = req.params.id 
+            const updatedToy = req.body
+            const filter = {_id : new ObjectId(id)}
+            const updatedDoc = {
+                $set : {price : updatedToy.price,
+                    detail_description : updatedToy.detail_description,
+                    available_quantity : updatedToy.available_quantity
+                }
+            }
+            const result = await toysCollection.updateOne(filter,updatedDoc)
+            res.send(result)
+
+        
         })
 
 
