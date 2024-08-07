@@ -103,6 +103,33 @@ async function run() {
         })
 
 
+        app.get('/searchToys', async (req, res) => {
+            // Extract the search term from the request headers
+            const searchQuery = req.query.item // Assuming the header key is 'search-term'
+        
+            if (!searchQuery) {
+                return res.status(400).send({ message: 'Search term is required in the headers' });
+            }
+        
+            // Create a MongoDB query to search in relevant fields (e.g., name, detail_description, sub_category)
+            const query = {
+                $or: 
+                  [{ name: { $regex: searchQuery, $options: 'i' } }]  , // Case-insensitive search in 'name'
+                  
+                
+            };
+        
+            try {
+                const cursor = toysCollection.find(query);
+                const result = await cursor.toArray();
+                res.send(result);
+            } catch (error) {
+                console.error('Error performing search:', error);
+                res.status(500).send({ message: 'An error occurred while performing the search' });
+            }
+        });
+
+
 
 
 
